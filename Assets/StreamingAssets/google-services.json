@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "619786731008",
+    "project_id": "arcadecombat",
+    "storage_bucket": "arcadecombat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619786731008:android:1fa7f0b1832df1ddde22e5",
+        "android_client_info": {
+          "package_name": "com.kel2.arcadecombat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPhProX8x2CPELekQ__2YvMdR5_mDkrF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
