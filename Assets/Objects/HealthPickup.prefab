@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b0851162516b6244f9ab7679cdb66512, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7dd21f826a119274bb085376073e5cbd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthRestore: 20
+  spinRotationSpeed: {x: 0, y: 180, z: 0}
 --- !u!58 &682421637565683466
 CircleCollider2D:
   m_ObjectHideFlags: 0
