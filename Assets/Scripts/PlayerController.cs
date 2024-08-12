@@ -268,6 +268,12 @@ public class PlayerController : MonoBehaviour
             CanMove = true;
             IsMoving = false;
             IsRunning = false;
+
+            animator.ResetTrigger(AnimationStrings.deathTrigger);
+            animator.SetBool(AnimationStrings.isAlive, true);
+            animator.Play("player_idle", 0); // Force play Idle animation on Layer 0
+
+            Debug.Log("Player respawned at checkpoint");
         }
         else
         {

@@ -5,11 +5,11 @@ using UnityEngine.Events;
 
 public class Damageable : MonoBehaviour
 {
-    public UnityEvent<float, Vector2> damageableHit;
-    public UnityEvent damageableDeath;
-    public UnityEvent<float, float> healthChanged;
-
     Animator animator;
+
+    public UnityEvent damageableDeath;
+    public UnityEvent<float, Vector2> damageableHit;    
+    public UnityEvent<float, float> healthChanged;
 
     [SerializeField]
     private float _maxHealth = 100;
@@ -126,7 +126,7 @@ public class Damageable : MonoBehaviour
             float maxHeal = Mathf.Max(MaxHealth - Health, 0);
             float actualHeal = Mathf.Min(maxHeal, healthRestore);
             Health += actualHeal;
-            CharacterEvents.characterHealed(gameObject, actualHeal);
+            CharacterEvents.characterHealed.Invoke(gameObject, actualHeal);
             return true;
         }
         return false;
