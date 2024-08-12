@@ -35,13 +35,14 @@ public class Damageable : MonoBehaviour
         }
         set
         {
-            _health = value;
+            _health = Mathf.Clamp(value, 0, MaxHealth); // Clamp the health value between 0 and MaxHealth
             healthChanged?.Invoke(_health, MaxHealth);
 
             // if health drops below 0, character is no longer alive
             if(_health <= 0)
             {
                 IsAlive = false;
+                animator.SetTrigger(AnimationStrings.deathTrigger);
             }
         }
     }
@@ -64,17 +65,13 @@ public class Damageable : MonoBehaviour
             _isAlive = value;
             animator.SetBool(AnimationStrings.isAlive, value);
             Debug.Log("IsAlive set " + value);
-
-            if(value == false)
-            {
-                damageableDeath.Invoke();
-            }
         }
     }
 
     // The velocity should not be changed while this is true but needs to be respected by other physic components
     // like the player controller
-    public bool LockVelocity { get {
+    public bool LockVelocity { get 
+        {
             return animator.GetBool(AnimationStrings.lockVelocity);
         } 
         set
@@ -133,5 +130,12 @@ public class Damageable : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public void InstantKill()
+    {
+        Health = 0;
+        animator.SetTrigger(AnimationStrings.deathTrigger);
+        IsAlive = false;
     }
 }

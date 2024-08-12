@@ -7,30 +7,64 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
 
 public class PlayerController : MonoBehaviour
-{
-    Vector2 moveInput;
+{   
     Rigidbody2D rb;
     Animator animator;
+    Vector2 moveInput;
     TouchingDirections touchingDirections;
     Damageable damageable;
 
     public float jumpImpulse = 8f;
     public float walkSpeed = 5f;
     public float runSpeed = 8f;
-    public float CurrentMoveSpeed { get
+    private Checkpoint currentCheckpoint;
+
+    // Dash variables
+    private bool canDash = true;
+    private bool isDashing;
+    private float dashingPower = 24f;
+    private float dashingTime = 0.2f;
+    private float dashingCooldown = 1f;
+    [SerializeField] private TrailRenderer tr;
+
+    // Player facing direction
+    public bool _isFacingRight = true;
+    public bool IsFacingRight 
+    { 
+        get {return _isFacingRight;} 
+        private set 
+        {
+            if(_isFacingRight != value)
+            {
+                //Flip the local scale to make the player face the opposite direction
+                transform.localScale *= new Vector2(-1, 1);
+            }
+            _isFacingRight = value;
+        }
+    }
+
+    // Player movement and state
+    public bool CanMove 
+    { 
+        get { return animator.GetBool(AnimationStrings.canMove); }
+        private set { animator.SetBool(AnimationStrings.canMove, value); }
+    }
+
+    public bool IsAlive
+    {
+        get { return animator.GetBool(AnimationStrings.isAlive); }
+        private set { animator.SetBool(AnimationStrings.isAlive, value); }
+    }
+
+    public float CurrentMoveSpeed 
+    { 
+        get
         {
             if(CanMove)
             {
                 if(IsMoving && !touchingDirections.IsOnWall)
                 {
-                    if(IsRunning)
-                    {
-                        return runSpeed;
-                    }
-                    else
-                    {
-                        return walkSpeed;
-                    }
+                    return IsRunning ? runSpeed : walkSpeed;
                 }
                 else
                 {
@@ -49,10 +83,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private bool _isMoving = false;
-    public bool IsMoving { get
-        {
-            return _isMoving;
-        }
+    public bool IsMoving 
+    { 
+        get { return _isMoving; }
         private set
         {
             _isMoving = value;
@@ -64,49 +97,13 @@ public class PlayerController : MonoBehaviour
     private bool _isRunning = false;
     public bool IsRunning
     {
-        get
-        {
-            return _isRunning;
-        }
-        set
+        get { return _isRunning; }
+        private set
         {
             _isRunning = value;
             animator.SetBool(AnimationStrings.isRunning, value);
         }
     }
-
-    public bool _isFacingRight = true;
-
-    public bool IsFacingRight { get {return _isFacingRight;} private set {
-        if(_isFacingRight != value)
-        {
-            //Flip the local scale to make the player face the opposite direction
-            transform.localScale *= new Vector2(-1, 1);
-        }
-        _isFacingRight =value;
-    }}
-
-    public bool CanMove { get
-        {
-            return animator.GetBool(AnimationStrings.canMove);
-        }
-    }
-
-    public bool IsAlive
-    {
-        get
-        {
-            return animator.GetBool(AnimationStrings.isAlive);
-        }
-    }
-
-    private bool canDash = true;
-    private bool isDashing;
-    private float dashingPower = 24f;
-    private float dashingTime = 0.2f;
-    private float dashingCooldown = 1f;
-    [SerializeField]
-    private TrailRenderer tr;
     
     private void Awake()
     {  
@@ -114,9 +111,11 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
         damageable = GetComponent<Damageable>();
+
+        damageable.healthChanged.AddListener(OnHealthChanged);
     }
 
-    private void Update()
+    void Update()
     {
         if(isDashing)
         {
@@ -142,21 +141,6 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat(AnimationStrings.yVelocity, rb.velocity.y);
     }
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-        
-        if(IsAlive)
-        {
-            IsMoving = moveInput != Vector2.zero;
-            SetFacingDirection(moveInput);
-        } else
-        {
-            IsMoving = false;
-        }
-        
-    }
-
     private void SetFacingDirection(Vector2 moveInput)
     {
         if(moveInput.x > 0 && !IsFacingRight)
@@ -169,6 +153,22 @@ public class PlayerController : MonoBehaviour
             //Face the left
             IsFacingRight = false;
         }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+        
+        if(IsAlive)
+        {
+            IsMoving = moveInput != Vector2.zero;
+            SetFacingDirection(moveInput);
+        } 
+        else
+        {
+            IsMoving = false;
+        }
+        
     }
 
     public void OnRun(InputAction.CallbackContext context)
@@ -228,5 +228,50 @@ public class PlayerController : MonoBehaviour
         isDashing = false;
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
+    }
+
+    private void OnHealthChanged(float health, float MaxHealth)
+    {
+        if (health <= 0)
+        {
+            StartCoroutine(RespawnAfterDelay());
+        }
+    }
+
+    public void SetCheckpoint(Checkpoint checkpoint)
+    {
+        currentCheckpoint = checkpoint;
+    }
+
+    public void InstantDeath()
+    {
+        damageable.InstantKill();
+        StartCoroutine(RespawnAfterDelay());
+    }
+
+    private IEnumerator RespawnAfterDelay()
+    {
+        yield return new WaitForSeconds(2f); // Adjust this delay as necessary
+
+        Respawn();
+    }
+
+    private void Respawn()
+    {
+        if(currentCheckpoint != null)
+        {
+            transform.position = currentCheckpoint.transform.position;
+            damageable.Health = damageable.MaxHealth;
+            rb.velocity = Vector2.zero;
+
+            damageable.IsAlive = true;
+            CanMove = true;
+            IsMoving = false;
+            IsRunning = false;
+        }
+        else
+        {
+            Debug.LogWarning("No checkpoint set");
+        }
     }
 }
