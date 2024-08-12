@@ -23,4 +23,5 @@ internal class AnimationStrings
     internal static string attackCooldown = "attackCooldown";
     internal static string rangedAttackTrigger = "rangedAttack";
     internal static string canDash = "canDash";
+    internal static string deathTrigger = "deathTrigger";
 }

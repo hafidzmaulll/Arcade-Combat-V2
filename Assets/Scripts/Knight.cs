@@ -124,5 +124,10 @@ public class Knight : MonoBehaviour
             FlipDirection();
         }
     }
+
+    public void InstantDeath()
+    {
+        damageable.InstantKill();
+    }
 }
 
