@@ -19,7 +19,10 @@ public class FlyingEye : MonoBehaviour
     int waypointNum = 0;
 
     public bool _hasTarget = false;
-    public bool HasTarget { get { return _hasTarget; } private set 
+    public bool HasTarget 
+    { 
+        get { return _hasTarget; } 
+        private set 
         {
             _hasTarget = value;
             animator.SetBool(AnimationStrings.hasTarget, value);
@@ -55,25 +58,32 @@ public class FlyingEye : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Ensure no movement logic occurs if the enemy is dead
+        if(!damageable.IsAlive) return;
+
         HasTarget = biteDetectionZone.detectedColliders.Count > 0;
     }
 
     private void FixedUpdate()
     {
-        if(damageable.IsAlive)
+        // Ensure no movement logic occurs if the enemy is dead
+        if(!damageable.IsAlive) return;
+
+        if(CanMove)
         {
-            if(CanMove)
-            {
-                Flight();
-            } else
-            {
-                rb.velocity = Vector3.zero;
-            }
-        } 
+            Flight();
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+        }
     }
 
     private void Flight()
     {
+        // Ensure no movement logic occurs if the enemy is dead
+        if(!damageable.IsAlive) return;
+
         // Fly to next waypoint
         Vector2 directionToWaypoint = (nextWaypoint.position - transform.position).normalized;
 
@@ -83,7 +93,7 @@ public class FlyingEye : MonoBehaviour
         rb.velocity = directionToWaypoint * flightSpeed;
         UpdateDirection();
 
-        // See if we need switch waypoints
+        // See if we need to switch waypoints
         if(distance < waypointReachedDistance)
         {
             // Switch to next waypoint
@@ -101,6 +111,9 @@ public class FlyingEye : MonoBehaviour
 
     private void UpdateDirection()
     {
+        // Ensure no movement logic occurs if the enemy is dead
+        if(!damageable.IsAlive) return;
+
         Vector3 locScale = transform.localScale;
 
         if(transform.localScale.x > 0)
@@ -111,7 +124,8 @@ public class FlyingEye : MonoBehaviour
                 // Flip
                 transform.localScale = new Vector3(-1 * locScale.x, locScale.y, locScale.z);
             }
-        } else
+        }
+        else
         {
             // Facing the left
             if(rb.velocity.x > 0)
@@ -124,9 +138,13 @@ public class FlyingEye : MonoBehaviour
 
     public void OnDeath()
     {
-        // Dead flyier falls to the ground
-            rb.gravityScale = 2f;
-            rb.velocity = new Vector2(0, rb.velocity.y);
-            deathCollider.enabled = true;
+        // Stop all movement and fall to the ground
+        rb.velocity = Vector2.zero; // Stop horizontal movement
+        rb.gravityScale = 2f; // Increase gravity to make it fall
+        deathCollider.enabled = true; // Enable the collider for death
+
+        // Disable the ability to move further
+        animator.SetBool(AnimationStrings.canMove, false);
+        enabled = false; // Optionally disable the entire script
     }
 }

@@ -11,6 +11,13 @@ public class SpikeTrap : MonoBehaviour
         {
             player.InstantDeath();
         }
+    } else if (collision.CompareTag("Enemy"))
+    {
+        Knight enemy = collision.GetComponent<Knight>();
+        if (enemy != null)
+        {
+            enemy.InstantDeath();
+        }
     }
 }
 }
