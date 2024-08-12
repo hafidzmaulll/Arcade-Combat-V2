@@ -166,9 +166,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d2b7193941b6324c8fb1b65c5d7ad7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageableHit:
-    m_PersistentCalls:
-      m_Calls: []
   damageableDeath:
     m_PersistentCalls:
       m_Calls:
@@ -184,6 +181,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  damageableHit:
+    m_PersistentCalls:
+      m_Calls: []
   healthChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -461,7 +461,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.16443706, y: -1.528342}
+  m_Offset: {x: 0.15445662, y: -1.528342}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -472,5 +472,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.0259929, y: 0.1716342}
+  m_Size: {x: 1.0079899, y: 0.1716342}
   m_EdgeRadius: 0
