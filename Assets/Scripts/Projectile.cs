@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // If you want the projectile to be effected by gravity by default, make it dynamic mode rigidbody
+        // If you want the projectile to be affected by gravity by default, make it a dynamic mode Rigidbody
         rb.velocity = new Vector2(moveSpeed.x * transform.localScale.x, moveSpeed.y);
     }
 
@@ -34,9 +34,15 @@ public class Projectile : MonoBehaviour
             bool gotHit = damageable.Hit(damage, deliveredKnockback);
 
             if(gotHit)
+            {
                 Debug.Log(collision.name + " hit for " + damage);
                 Destroy(gameObject);
+            }
+        }
+        else if (collision.gameObject.CompareTag("Ground"))
+        {
+            // If the collision object is not damageable (e.g., ground), destroy the projectile
+            Destroy(gameObject);
         }
     }
-
 }
