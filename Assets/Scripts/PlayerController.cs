@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
-
 public class PlayerController : MonoBehaviour
 {   
     Rigidbody2D rb;
@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     Vector2 moveInput;
     TouchingDirections touchingDirections;
     Damageable damageable;
+    PhotonView view;
 
     public float jumpImpulse = 8f;
     public float walkSpeed = 5f;
@@ -30,8 +31,8 @@ public class PlayerController : MonoBehaviour
     // Player facing direction
     public bool _isFacingRight = true;
     public bool IsFacingRight 
-    { 
-        get {return _isFacingRight;} 
+    {
+        get { return _isFacingRight; }
         private set 
         {
             if(_isFacingRight != value)
@@ -77,7 +78,6 @@ public class PlayerController : MonoBehaviour
                 // Movement locked
                 return 0;
             }
-            
         }
     }
 
@@ -111,107 +111,133 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
         damageable = GetComponent<Damageable>();
+        view = GetComponent<PhotonView>();
 
         damageable.healthChanged.AddListener(OnHealthChanged);
     }
 
     void Update()
     {
-        if(isDashing)
+        if(view.IsMine)
         {
-            return;
-        }
+            if(isDashing)
+            {
+                return;
+            }
 
-        if(Input.GetKeyDown(KeyCode.LeftControl) && canDash)
-        {
-            StartCoroutine(Dash());
+            if(Input.GetKeyDown(KeyCode.LeftControl) && canDash)
+            {
+                StartCoroutine(Dash());
+            }
         }
     }
 
     private void FixedUpdate()
     {
-        if(isDashing)
+        if(view.IsMine)
         {
-            return;
-        }
+            if(isDashing)
+            {
+                return;
+            }
         
-        if(!damageable.LockVelocity)
-            rb.velocity = new Vector2(moveInput.x * CurrentMoveSpeed, rb.velocity.y);
+            if(!damageable.LockVelocity)
+                rb.velocity = new Vector2(moveInput.x * CurrentMoveSpeed, rb.velocity.y);
 
-        animator.SetFloat(AnimationStrings.yVelocity, rb.velocity.y);
+            animator.SetFloat(AnimationStrings.yVelocity, rb.velocity.y);
+        }
     }
 
     private void SetFacingDirection(Vector2 moveInput)
     {
-        if(moveInput.x > 0 && !IsFacingRight)
+        if(view.IsMine)
         {
-            //Face the right
-            IsFacingRight = true;
-        }
-        else if(moveInput.x < 0 && IsFacingRight)
-        {
-            //Face the left
-            IsFacingRight = false;
+            if(moveInput.x > 0 && !IsFacingRight)
+            {
+                //Face the right
+                IsFacingRight = true;
+            }
+            else if(moveInput.x < 0 && IsFacingRight)
+            {
+                //Face the left
+                IsFacingRight = false;
+            }
         }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();
-        
-        if(IsAlive)
+        if(view.IsMine)
         {
-            IsMoving = moveInput != Vector2.zero;
-            SetFacingDirection(moveInput);
-        } 
-        else
-        {
-            IsMoving = false;
+            moveInput = context.ReadValue<Vector2>();
+
+            if(IsAlive)
+            {
+                IsMoving = moveInput != Vector2.zero;
+                SetFacingDirection(moveInput);
+            } 
+            else
+            {
+                IsMoving = false;
+            }
         }
-        
     }
 
     public void OnRun(InputAction.CallbackContext context)
     {
-        if(context.started)
+        if(view.IsMine)
         {
-            IsRunning = true;
-        }
-        else if(context.canceled)
-        {
-            IsRunning = false;
+            if(context.started)
+            {
+                IsRunning = true;
+            }
+            else if(context.canceled)
+            {
+                IsRunning = false;
+            }
         }
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        // TODO Check if alive as well
-        if(context.started && touchingDirections.IsGrounded && CanMove)
+        if(view.IsMine)
         {
-            animator.SetTrigger(AnimationStrings.jumpTrigger);
-            rb.velocity = new Vector2(rb.velocity.x, jumpImpulse);
+            if(context.started && touchingDirections.IsGrounded && CanMove)
+            {
+                animator.SetTrigger(AnimationStrings.jumpTrigger);
+                rb.velocity = new Vector2(rb.velocity.x, jumpImpulse);
+            }
         }
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if(context.started)
+        if(view.IsMine)
         {
-            animator.SetTrigger(AnimationStrings.attackTrigger);
+            if(context.started)
+            {
+                animator.SetTrigger(AnimationStrings.attackTrigger);
+            }
         }
     }
 
     public void OnRangedAttack(InputAction.CallbackContext context)
     {
-        if(context.started)
+        if(view.IsMine)
         {
-            animator.SetTrigger(AnimationStrings.rangedAttackTrigger);
+            if(context.started)
+            {
+                animator.SetTrigger(AnimationStrings.rangedAttackTrigger);
+            }
         }
     }
 
     public void OnHit(float damage, Vector2 knockback)
     {
-        rb.velocity = new Vector2(knockback.x, rb.velocity.y + knockback.y);
+        if(view.IsMine)
+        {
+            rb.velocity = new Vector2(knockback.x, rb.velocity.y + knockback.y);
+        }
     }
 
     private IEnumerator Dash()
@@ -232,48 +258,63 @@ public class PlayerController : MonoBehaviour
 
     private void OnHealthChanged(float health, float MaxHealth)
     {
-        if (health <= 0)
+        if(view.IsMine)
         {
-            StartCoroutine(RespawnAfterDelay());
+            if (health <= 0)
+            {
+                StartCoroutine(RespawnAfterDelay());
+            }
         }
     }
 
     public void SetCheckpoint(Checkpoint checkpoint)
     {
-        currentCheckpoint = checkpoint;
+        if(view.IsMine)
+        {
+            currentCheckpoint = checkpoint;
+        }
     }
 
     public void InstantDeath()
     {
-        damageable.InstantKill();
-        StartCoroutine(RespawnAfterDelay());
+        if(view.IsMine)
+        {
+            damageable.InstantKill();
+            StartCoroutine(RespawnAfterDelay());
+        }
     }
 
     private IEnumerator RespawnAfterDelay()
     {
-        yield return new WaitForSeconds(2f); // Adjust this delay as necessary
+        if(view.IsMine)
+        {
+            yield return new WaitForSeconds(2f); // Adjust this delay as necessary
 
-        Respawn();
+            Respawn();
+        }
     }
 
     private void Respawn()
     {
-        if(currentCheckpoint != null)
+        if(view.IsMine)
         {
-            transform.position = currentCheckpoint.transform.position;
-            damageable.Health = damageable.MaxHealth;
-            rb.velocity = Vector2.zero;
+            if(currentCheckpoint != null)
+            {
+                transform.position = currentCheckpoint.transform.position;
+                damageable.Health = damageable.MaxHealth;
+                rb.velocity = Vector2.zero;
 
-            damageable.IsAlive = true;
-            CanMove = true;
-            IsMoving = false;
-            IsRunning = false;
+                damageable.IsAlive = true;
+                CanMove = true;
+                IsMoving = false;
+                IsRunning = false;
 
-            Debug.Log("Player respawned at checkpoint");
-        }
-        else
-        {
-            Debug.LogWarning("No checkpoint set");
+                Debug.Log("Player respawned at checkpoint");
+            }
+            else
+            {
+                Debug.LogWarning("No checkpoint set");
+            }
         }
     }
 }
