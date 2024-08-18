@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class FlyingEye : MonoBehaviour
+public class FlyingEye : MonoBehaviourPun, IPunObservable
 {
     Animator animator;
     Rigidbody2D rb;
@@ -47,7 +48,10 @@ public class FlyingEye : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        nextWaypoint = waypoints[waypointNum];
+        if (waypoints.Count > 0)
+        {
+            nextWaypoint = waypoints[waypointNum];
+        }
     }
 
     private void OnEnable()
@@ -58,7 +62,6 @@ public class FlyingEye : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Ensure no movement logic occurs if the enemy is dead
         if(!damageable.IsAlive) return;
 
         HasTarget = biteDetectionZone.detectedColliders.Count > 0;
@@ -66,7 +69,6 @@ public class FlyingEye : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Ensure no movement logic occurs if the enemy is dead
         if(!damageable.IsAlive) return;
 
         if(CanMove)
@@ -81,56 +83,45 @@ public class FlyingEye : MonoBehaviour
 
     private void Flight()
     {
-        // Ensure no movement logic occurs if the enemy is dead
         if(!damageable.IsAlive) return;
 
-        // Fly to next waypoint
+        if (nextWaypoint == null) return;
+
         Vector2 directionToWaypoint = (nextWaypoint.position - transform.position).normalized;
 
-        // Check if we have reached the waypoint already
         float distance = Vector2.Distance(nextWaypoint.position, transform.position);
 
         rb.velocity = directionToWaypoint * flightSpeed;
         UpdateDirection();
 
-        // See if we need to switch waypoints
         if(distance < waypointReachedDistance)
         {
-            // Switch to next waypoint
             waypointNum++;
-
             if(waypointNum >= waypoints.Count)
             {
-                // Loop back to original waypoint
                 waypointNum = 0;
             }
-
             nextWaypoint = waypoints[waypointNum];
         }
     }
 
     private void UpdateDirection()
     {
-        // Ensure no movement logic occurs if the enemy is dead
         if(!damageable.IsAlive) return;
 
         Vector3 locScale = transform.localScale;
 
         if(transform.localScale.x > 0)
         {
-            // Facing the right
             if(rb.velocity.x < 0)
             {
-                // Flip
                 transform.localScale = new Vector3(-1 * locScale.x, locScale.y, locScale.z);
             }
         }
         else
         {
-            // Facing the left
             if(rb.velocity.x > 0)
             {
-                // Flip
                 transform.localScale = new Vector3(-1 * locScale.x, locScale.y, locScale.z);
             }
         }
@@ -138,13 +129,44 @@ public class FlyingEye : MonoBehaviour
 
     public void OnDeath()
     {
-        // Stop all movement and fall to the ground
-        rb.velocity = Vector2.zero; // Stop horizontal movement
-        rb.gravityScale = 2f; // Increase gravity to make it fall
-        deathCollider.enabled = true; // Enable the collider for death
+        photonView.RPC("RPC_OnDeath", RpcTarget.AllBuffered);
+    }
 
-        // Disable the ability to move further
+    [PunRPC]
+    private void RPC_OnDeath()
+    {
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 2f;
+        deathCollider.enabled = true;
         animator.SetBool(AnimationStrings.canMove, false);
-        enabled = false; // Optionally disable the entire script
+        enabled = false;
+    }
+
+    public void SetWaypoints(List<Transform> newWaypoints)
+    {
+        waypoints = newWaypoints;
+        waypointNum = 0;
+        if (waypoints.Count > 0)
+        {
+            nextWaypoint = waypoints[waypointNum];
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Send relevant data to other players
+            stream.SendNext(damageable.IsAlive);
+        }
+        else
+        {
+            // Receive data from other players
+            bool isAlive = (bool)stream.ReceiveNext();
+            if (!isAlive && damageable.IsAlive)
+            {
+                OnDeath();
+            }
+        }
     }
 }
