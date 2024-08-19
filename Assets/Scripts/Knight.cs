@@ -4,13 +4,12 @@ using UnityEngine;
 using Photon.Pun;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
-public class Knight : MonoBehaviour
+public class Knight : MonoBehaviourPun, IPunObservable
 {
     Animator animator;
     Rigidbody2D rb;
     TouchingDirections touchingDirections;
     Damageable damageable;
-    PhotonView photonView;
 
     public DetectionZone attackZone;
     public DetectionZone cliffDetectionZone;
@@ -29,7 +28,6 @@ public class Knight : MonoBehaviour
             if (_walkDirection != value)
             {
                 gameObject.transform.localScale = new Vector2(gameObject.transform.localScale.x * -1, gameObject.transform.localScale.y);
-
                 walkDirectionVector = value == WalkableDirection.Right ? Vector2.right : Vector2.left;
             }
             _walkDirection = value;
@@ -61,18 +59,29 @@ public class Knight : MonoBehaviour
         private set { animator.SetFloat(AnimationStrings.attackCooldown, Mathf.Max(value, 0)); }
     }
 
+    private Vector3 networkPosition;
+    private Quaternion networkRotation;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         touchingDirections = GetComponent<TouchingDirections>();
         damageable = GetComponent<Damageable>();
-        photonView = GetComponent<PhotonView>();
+
+        networkPosition = transform.position;
+        networkRotation = transform.rotation;
     }
 
     private void Update()
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine)
+        {
+            // Interpolate position and rotation for smoother movement on non-owner clients
+            transform.position = Vector3.Lerp(transform.position, networkPosition, Time.deltaTime * 10);
+            transform.rotation = Quaternion.Lerp(transform.rotation, networkRotation, Time.deltaTime * 10);
+            return;
+        }
 
         HasTarget = attackZone.detectedColliders.Count > 0;
 
@@ -103,6 +112,13 @@ public class Knight : MonoBehaviour
     private void FlipDirection()
     {
         WalkDirection = WalkDirection == WalkableDirection.Right ? WalkableDirection.Left : WalkableDirection.Right;
+        photonView.RPC("RPC_ChangeDirection", RpcTarget.AllBuffered, (int)WalkDirection);
+    }
+
+    [PunRPC]
+    private void RPC_ChangeDirection(int direction)
+    {
+        WalkDirection = (WalkableDirection)direction;
     }
 
     public void InstantDeath()
@@ -135,5 +151,19 @@ public class Knight : MonoBehaviour
 
         animator.SetBool(AnimationStrings.canMove, false);
         enabled = false; // Optionally disable the entire script
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            networkPosition = (Vector3)stream.ReceiveNext();
+            networkRotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 }

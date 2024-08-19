@@ -14,7 +14,20 @@ public class Attack : MonoBehaviour
 
         if(damageable != null)
         {
-            Vector2 deliveredKnockback = transform.parent.localScale.x > 0 ? knockback : new Vector2(-knockback.x, knockback.y);
+            // Get the parent (Knight) and its direction
+            Knight knight = damageable.GetComponent<Knight>();
+            Vector2 deliveredKnockback = knockback;
+
+            // Check if the hit object is a Knight and apply knockback in the direction it's moving
+            if (knight != null)
+            {
+                deliveredKnockback.x = knight.WalkDirection == Knight.WalkableDirection.Right ? Mathf.Abs(knockback.x) : -Mathf.Abs(knockback.x);
+            }
+            else
+            {
+                // If it's not a Knight, use the usual knockback logic
+                deliveredKnockback = transform.parent.localScale.x > 0 ? knockback : new Vector2(-knockback.x, knockback.y);
+            }
 
             // Hit the target
             bool gotHit = damageable.Hit(attackDamage, deliveredKnockback);
