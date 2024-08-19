@@ -6432,6 +6432,59 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93929221aca05184daae15c787357706, type: 3}
+--- !u!1 &1042380916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1042380917}
+  - component: {fileID: 1042380918}
+  m_Layer: 0
+  m_Name: SpawnFlyingEye
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1042380917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042380916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.73, y: -0.02, z: -0.0662581}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1042380918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042380916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43a3fc673e577794cb0af5c61b71fb5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flyingEyePrefab: {fileID: 4825385064060799713, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
+  spawnPoints:
+  - {fileID: 1042380917}
+  waypointSet1:
+  - {fileID: 276670658}
+  - {fileID: 1078817750}
+  - {fileID: 2120145337}
+  - {fileID: 264138912}
+  waypointSet2: []
 --- !u!1 &1078817749
 GameObject:
   m_ObjectHideFlags: 0
@@ -7024,91 +7077,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 511300415}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1272241416710413223
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1317311867239314709, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: waypoints.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 1317311867239314709, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: waypoints.Array.data[0]
-      value: 
-      objectReference: {fileID: 276670658}
-    - target: {fileID: 1317311867239314709, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: waypoints.Array.data[1]
-      value: 
-      objectReference: {fileID: 1078817750}
-    - target: {fileID: 1317311867239314709, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: waypoints.Array.data[2]
-      value: 
-      objectReference: {fileID: 2120145337}
-    - target: {fileID: 1317311867239314709, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: waypoints.Array.data[3]
-      value: 
-      objectReference: {fileID: 264138912}
-    - target: {fileID: 4825385064060799713, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_Name
-      value: FlyingEye
-      objectReference: {fileID: 0}
-    - target: {fileID: 6970057732198778533, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: sceneViewId
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7097537804759966785, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: invincibilityTime
-      value: 0.175
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 4.58
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8763531778120900687, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 2a8801452d15fe648a48c956df5fc89a, type: 3}
 --- !u!1001 &5087820973628305987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7239,9 +7207,9 @@ SceneRoots:
   - {fileID: 5087820973628305987}
   - {fileID: 1980193096}
   - {fileID: 6047354127186566714}
-  - {fileID: 1272241416710413223}
   - {fileID: 511300415}
   - {fileID: 782283788}
   - {fileID: 1355179752}
   - {fileID: 919278026}
   - {fileID: 1731515871}
+  - {fileID: 1042380917}

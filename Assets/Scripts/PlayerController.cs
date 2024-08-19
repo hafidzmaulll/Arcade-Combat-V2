@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using Photon.Pun;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {   
     Rigidbody2D rb;
     Animator animator;
@@ -29,18 +29,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TrailRenderer tr;
 
     // Player facing direction
-    public bool _isFacingRight = true;
+    [SerializeField]
+    private bool _isFacingRight = true;
     public bool IsFacingRight 
     {
         get { return _isFacingRight; }
         private set 
         {
-            if(_isFacingRight != value)
+            if (_isFacingRight != value)
             {
                 //Flip the local scale to make the player face the opposite direction
-                transform.localScale *= new Vector2(-1, 1);
+                transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
+                _isFacingRight = value;
+
+                // Synchronize the facing direction across the network
+                if (view.IsMine)
+                {
+                    photonView.RPC("SyncFacingDirection", RpcTarget.OthersBuffered, _isFacingRight);
+                }
             }
-            _isFacingRight = value;
         }
     }
 
@@ -315,6 +322,31 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.LogWarning("No checkpoint set");
             }
+        }
+    }
+
+    // Synchronize the facing direction across the network
+    [PunRPC]
+    private void SyncFacingDirection(bool isFacingRight)
+    {
+        if (isFacingRight != IsFacingRight)
+        {
+            IsFacingRight = isFacingRight;
+        }
+    }
+
+    // Photon serialization for synchronization
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Send facing direction to other players
+            stream.SendNext(IsFacingRight);
+        }
+        else
+        {
+            // Receive facing direction from the network
+            IsFacingRight = (bool)stream.ReceiveNext();
         }
     }
 }

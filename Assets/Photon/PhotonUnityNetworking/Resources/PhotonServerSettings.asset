@@ -42,6 +42,10 @@ MonoBehaviour:
   - PickupHealth
   - RPC_OnDeath
   - RPC_InstantDeath
+  - OnDeath
+  - HandleDeath
+  - SyncFacingDirection
+  - ChangeDirection
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
