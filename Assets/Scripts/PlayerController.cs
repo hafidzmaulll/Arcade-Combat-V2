@@ -118,15 +118,20 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        
         if(isDashing)
         {
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.LeftControl) && canDash)
+
+        if (Input.GetKeyDown(KeyCode.LeftControl) && canDash)
         {
             StartCoroutine(Dash());
         }
+
+        if (DialogueManager.isActive == true)
+            return;
     }
 
     private void FixedUpdate()
