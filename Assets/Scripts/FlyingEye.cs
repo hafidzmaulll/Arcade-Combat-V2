@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class FlyingEye : MonoBehaviour
+public class FlyingEye : MonoBehaviourPun, IPunObservable
 {
     Animator animator;
     Rigidbody2D rb;
@@ -19,7 +20,10 @@ public class FlyingEye : MonoBehaviour
     int waypointNum = 0;
 
     public bool _hasTarget = false;
-    public bool HasTarget { get { return _hasTarget; } private set 
+    public bool HasTarget 
+    { 
+        get { return _hasTarget; } 
+        private set 
         {
             _hasTarget = value;
             animator.SetBool(AnimationStrings.hasTarget, value);
@@ -34,17 +38,16 @@ public class FlyingEye : MonoBehaviour
         }
     }
 
+    private Vector3 networkPosition;
+    private Quaternion networkRotation;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         damageable = GetComponent<Damageable>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        nextWaypoint = waypoints[waypointNum];
+        networkPosition = transform.position;
+        networkRotation = transform.rotation;
     }
 
     private void OnEnable()
@@ -52,46 +55,62 @@ public class FlyingEye : MonoBehaviour
         damageable.damageableDeath.AddListener(OnDeath);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        HasTarget = biteDetectionZone.detectedColliders.Count > 0;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            nextWaypoint = waypoints[waypointNum];
+        }
+    }
+
+    private void Update()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            HasTarget = biteDetectionZone.detectedColliders.Count > 0;
+        }
     }
 
     private void FixedUpdate()
     {
-        if(damageable.IsAlive)
+        if (!damageable.IsAlive) return;
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            if(CanMove)
+            if (CanMove)
             {
                 Flight();
-            } else
+            }
+            else
             {
                 rb.velocity = Vector3.zero;
             }
-        } 
+        }
+        else
+        {
+            // Interpolate position and rotation for smoother movement on non-master clients
+            transform.position = Vector3.Lerp(transform.position, networkPosition, Time.fixedDeltaTime * 10);
+            transform.rotation = Quaternion.Lerp(transform.rotation, networkRotation, Time.fixedDeltaTime * 10);
+        }
     }
 
     private void Flight()
     {
-        // Fly to next waypoint
+        if (!damageable.IsAlive) return;
+
         Vector2 directionToWaypoint = (nextWaypoint.position - transform.position).normalized;
 
-        // Check if we have reached the waypoint already
         float distance = Vector2.Distance(nextWaypoint.position, transform.position);
 
         rb.velocity = directionToWaypoint * flightSpeed;
         UpdateDirection();
 
-        // See if we need switch waypoints
-        if(distance < waypointReachedDistance)
+        if (distance < waypointReachedDistance)
         {
-            // Switch to next waypoint
             waypointNum++;
 
-            if(waypointNum >= waypoints.Count)
+            if (waypointNum >= waypoints.Count)
             {
-                // Loop back to original waypoint
                 waypointNum = 0;
             }
 
@@ -99,34 +118,77 @@ public class FlyingEye : MonoBehaviour
         }
     }
 
-    private void UpdateDirection()
+    [PunRPC]
+    private void ChangeDirection(int direction)
     {
         Vector3 locScale = transform.localScale;
+        transform.localScale = new Vector3(direction * Mathf.Abs(locScale.x), locScale.y, locScale.z);
+    }
 
-        if(transform.localScale.x > 0)
+    private void UpdateDirection()
+    {
+        if (PhotonNetwork.IsMasterClient)
         {
-            // Facing the right
-            if(rb.velocity.x < 0)
+            Vector3 locScale = transform.localScale;
+
+            if (transform.localScale.x > 0 && rb.velocity.x < 0)
             {
-                // Flip
-                transform.localScale = new Vector3(-1 * locScale.x, locScale.y, locScale.z);
+                photonView.RPC("ChangeDirection", RpcTarget.AllBuffered, -1);
             }
-        } else
-        {
-            // Facing the left
-            if(rb.velocity.x > 0)
+            else if (transform.localScale.x < 0 && rb.velocity.x > 0)
             {
-                // Flip
-                transform.localScale = new Vector3(-1 * locScale.x, locScale.y, locScale.z);
+                photonView.RPC("ChangeDirection", RpcTarget.AllBuffered, 1);
             }
         }
     }
 
     public void OnDeath()
     {
-        // Dead flyier falls to the ground
-            rb.gravityScale = 2f;
-            rb.velocity = new Vector2(0, rb.velocity.y);
-            deathCollider.enabled = true;
+        photonView.RPC("HandleDeath", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    public void HandleDeath()
+    {
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 2f;
+        deathCollider.enabled = true;
+        animator.SetBool(AnimationStrings.canMove, false);
+        enabled = false;
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void SetWaypoints(List<Transform> newWaypoints)
+    {
+        waypoints = newWaypoints;
+        waypointNum = 0;
+        if (waypoints.Count > 0)
+        {
+            nextWaypoint = waypoints[waypointNum];
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+            stream.SendNext(damageable.IsAlive);
+        }
+        else
+        {
+            networkPosition = (Vector3)stream.ReceiveNext();
+            networkRotation = (Quaternion)stream.ReceiveNext();
+            damageable.IsAlive = (bool)stream.ReceiveNext();
+        }
     }
 }

@@ -1,11 +1,11 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
-public class Knight : MonoBehaviour
-{   
+public class Knight : MonoBehaviourPun, IPunObservable
+{
     Animator animator;
     Rigidbody2D rb;
     TouchingDirections touchingDirections;
@@ -14,7 +14,7 @@ public class Knight : MonoBehaviour
     public DetectionZone attackZone;
     public DetectionZone cliffDetectionZone;
     public float walkSpeed = 3f;
-    // public float walkStopRate = 0.2f;
+
     public enum WalkableDirection { Right, Left }
 
     private Vector2 walkDirectionVector = Vector2.right;
@@ -23,29 +23,26 @@ public class Knight : MonoBehaviour
     public WalkableDirection WalkDirection
     {
         get { return _walkDirection; }
-        set { 
-            if(_walkDirection != value)
+        set
+        {
+            if (_walkDirection != value)
             {
-                // Direction flipped
                 gameObject.transform.localScale = new Vector2(gameObject.transform.localScale.x * -1, gameObject.transform.localScale.y);
-
-                if(value == WalkableDirection.Right)
-                {
-                    walkDirectionVector = Vector2.right;
-                } else if(value == WalkableDirection.Left)
-                {
-                    walkDirectionVector = Vector2.left;
-                }
+                walkDirectionVector = value == WalkableDirection.Right ? Vector2.right : Vector2.left;
             }
-            _walkDirection = value; }
+            _walkDirection = value;
+        }
     }
 
     public bool _hasTarget = false;
-    public bool HasTarget { get { return _hasTarget; } private set 
+    public bool HasTarget
+    {
+        get { return _hasTarget; }
+        private set
         {
             _hasTarget = value;
             animator.SetBool(AnimationStrings.hasTarget, value);
-        } 
+        }
     }
 
     public bool CanMove
@@ -56,12 +53,14 @@ public class Knight : MonoBehaviour
         }
     }
 
-    public float AttackCooldown { get {
-            return animator.GetFloat(AnimationStrings.attackCooldown);
-        } private set {
-            animator.SetFloat(AnimationStrings.attackCooldown, Mathf.Max(value, 0));
-        }
+    public float AttackCooldown
+    {
+        get { return animator.GetFloat(AnimationStrings.attackCooldown); }
+        private set { animator.SetFloat(AnimationStrings.attackCooldown, Mathf.Max(value, 0)); }
     }
+
+    private Vector3 networkPosition;
+    private Quaternion networkRotation;
 
     private void Awake()
     {
@@ -69,29 +68,41 @@ public class Knight : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         touchingDirections = GetComponent<TouchingDirections>();
         damageable = GetComponent<Damageable>();
+
+        networkPosition = transform.position;
+        networkRotation = transform.rotation;
     }
 
-    void Update()
+    private void Update()
     {
+        if (!photonView.IsMine)
+        {
+            // Interpolate position and rotation for smoother movement on non-owner clients
+            transform.position = Vector3.Lerp(transform.position, networkPosition, Time.deltaTime * 10);
+            transform.rotation = Quaternion.Lerp(transform.rotation, networkRotation, Time.deltaTime * 10);
+            return;
+        }
+
         HasTarget = attackZone.detectedColliders.Count > 0;
 
-        if(AttackCooldown > 0)
+        if (AttackCooldown > 0)
         {
             AttackCooldown -= Time.deltaTime;
         }
-            
     }
 
     private void FixedUpdate()
     {
-        if(touchingDirections.IsGrounded && touchingDirections.IsOnWall)
+        if (!photonView.IsMine) return;
+
+        if (touchingDirections.IsGrounded && touchingDirections.IsOnWall)
         {
             FlipDirection();
         }
 
-        if(!damageable.LockVelocity)
+        if (!damageable.LockVelocity)
         {
-            if(CanMove && (touchingDirections.IsGrounded || cliffDetectionZone.detectedColliders.Count == 0))
+            if (CanMove && (touchingDirections.IsGrounded || cliffDetectionZone.detectedColliders.Count == 0))
                 rb.velocity = new Vector2(walkSpeed * walkDirectionVector.x, rb.velocity.y);
             else
                 rb.velocity = new Vector2(0, rb.velocity.y);
@@ -100,29 +111,59 @@ public class Knight : MonoBehaviour
 
     private void FlipDirection()
     {
-        if(WalkDirection == WalkableDirection.Right)
+        WalkDirection = WalkDirection == WalkableDirection.Right ? WalkableDirection.Left : WalkableDirection.Right;
+        photonView.RPC("RPC_ChangeDirection", RpcTarget.AllBuffered, (int)WalkDirection);
+    }
+
+    [PunRPC]
+    private void RPC_ChangeDirection(int direction)
+    {
+        WalkDirection = (WalkableDirection)direction;
+    }
+
+    public void InstantDeath()
+    {
+        if (photonView.IsMine)
         {
-            WalkDirection = WalkableDirection.Left;
-        } else if (WalkDirection == WalkableDirection.Left)
-        {
-            WalkDirection = WalkableDirection.Right;
-        } else
-        {
-            Debug.LogError("ERROR");
+            photonView.RPC("RPC_InstantDeath", RpcTarget.All);
         }
     }
 
-    public void OnHit(float damage, Vector2 knockback)
+    [PunRPC]
+    private void RPC_InstantDeath()
     {
-        rb.velocity = new Vector2(knockback.x, rb.velocity.y + knockback.y);
+        damageable.InstantKill();
     }
 
-    public void OnCliffDetected()
+    public void OnDeath()
     {
-        if(touchingDirections.IsGrounded)
+        if (photonView.IsMine)
         {
-            FlipDirection();
+            photonView.RPC("RPC_OnDeath", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_OnDeath()
+    {
+        rb.velocity = Vector2.zero; // Stop horizontal movement
+        rb.gravityScale = 2f; // Increase gravity to make it fall
+
+        animator.SetBool(AnimationStrings.canMove, false);
+        enabled = false; // Optionally disable the entire script
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            networkPosition = (Vector3)stream.ReceiveNext();
+            networkRotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }
-
