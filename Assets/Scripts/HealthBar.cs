@@ -1,55 +1,48 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class HealthBar : MonoBehaviour
 {
-    Damageable playerDamageable;
+    private Damageable playerDamageable;
 
     public Slider healthSlider;
     public TMP_Text healthBarText;
 
-    private void Awake()
+    public void Initialize(Damageable damageable)
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        playerDamageable = damageable;
 
-        if(player == null)
-        {
-            Debug.Log("No player found in the scene");
-        }
-
-        playerDamageable = player.GetComponent<Damageable>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
+        // Initialize health bar values
         healthSlider.value = CalculateSliderPercentage(playerDamageable.Health, playerDamageable.MaxHealth);
         healthBarText.text = "HP " + playerDamageable.Health + " / " + playerDamageable.MaxHealth;
+
+        // Subscribe to health change events
+        playerDamageable.healthChanged.AddListener(OnPlayerHealthChanged);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
-        
+        if (playerDamageable != null)
+        {
+            playerDamageable.healthChanged.AddListener(OnPlayerHealthChanged);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (playerDamageable != null)
+        {
+            playerDamageable.healthChanged.RemoveListener(OnPlayerHealthChanged);
+        }
     }
 
     private float CalculateSliderPercentage(float currentHealth, float maxHealth)
     {
         return currentHealth / maxHealth;
-    }
-
-    private void OnEnable()
-    {
-        playerDamageable.healthChanged.AddListener(OnPlayerHealthChanged);
-    }
-
-    private void OnDisable()
-    {
-        playerDamageable.healthChanged.RemoveListener(OnPlayerHealthChanged);
     }
 
     private void OnPlayerHealthChanged(float newHealth, float maxHealth)

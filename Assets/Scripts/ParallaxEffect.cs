@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using Photon.Pun;
 
 public class ParallaxEffect : MonoBehaviour
 {
@@ -19,10 +20,11 @@ public class ParallaxEffect : MonoBehaviour
 
     float zDistanceFromTarget => transform.position.z - followTarget.transform.position.z;
 
-    //If object is in front of target, use near clip plane. If behind target, use farClipPlane
+    // If object is in front of target, use near clip plane. If behind target, use farClipPlane
     float clippingPlane => (cam.transform.position.z + (zDistanceFromTarget > 0 ? cam.farClipPlane : cam.nearClipPlane));
 
-    // The futher the object from the player, the faster the ParallaxEffect object will move, Drag it's Z value closer to the target to make it move slower
+    // The further the object from the player, the faster the ParallaxEffect object will move, 
+    // Drag its Z value closer to the target to make it move slower
     float parallaxFactor => Mathf.Abs(zDistanceFromTarget) / clippingPlane;
 
     // Start is called before the first frame update
@@ -30,11 +32,39 @@ public class ParallaxEffect : MonoBehaviour
     {
         startingPosition = transform.position;
         startingZ = transform.position.z;
+
+        // Assign the followTarget dynamically for the local player
+        AssignFollowTarget();
+    }
+
+    void AssignFollowTarget()
+    {
+        // Find all objects tagged "Player"
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            PhotonView photonView = player.GetComponent<PhotonView>();
+
+            // Assign the followTarget to the local player's transform
+            if (photonView != null && photonView.IsMine)
+            {
+                followTarget = player.transform;
+                break;
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (followTarget == null)
+        {
+            // Try to reassign the followTarget if it was not found or lost
+            AssignFollowTarget();
+            return;
+        }
+
         // When the target moves, move the parallax object the same distance times a multiplier
         Vector2 newPosition = startingPosition + camMoveSinceStart * parallaxFactor;
 
