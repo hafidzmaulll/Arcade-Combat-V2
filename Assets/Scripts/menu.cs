@@ -15,6 +15,8 @@ public class menu : MonoBehaviour
         menupanel.SetActive(true);
         settingpanel.SetActive(false);
         creditpanel.SetActive(false);
+        settingpanel.GetComponent<SettingAudio>().Start();
+        AudioManager.instance.Play("Musik Main");
     }
 
     // Update is called once per frame
@@ -51,5 +53,12 @@ public class menu : MonoBehaviour
     {
         Application.Quit();
         Debug.Log("ANDA TELAH KELUAR...!");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
+
+
 }
