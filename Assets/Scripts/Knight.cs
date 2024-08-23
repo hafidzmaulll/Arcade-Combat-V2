@@ -71,6 +71,15 @@ public class Knight : MonoBehaviourPun, IPunObservable
 
         networkPosition = transform.position;
         networkRotation = transform.rotation;
+
+        // Add listener for cliff detection
+        cliffDetectionZone.noCollidersRemain.AddListener(OnCliffDetected);
+    }
+
+    private void OnDestroy()
+    {
+        // Remove listener when the object is destroyed to prevent memory leaks
+        cliffDetectionZone.noCollidersRemain.RemoveListener(OnCliffDetected);
     }
 
     private void Update()
@@ -102,10 +111,20 @@ public class Knight : MonoBehaviourPun, IPunObservable
 
         if (!damageable.LockVelocity)
         {
-            if (CanMove && (touchingDirections.IsGrounded || cliffDetectionZone.detectedColliders.Count == 0))
+            if (CanMove && touchingDirections.IsGrounded)
+            {
+                // Check for cliffs
+                if (cliffDetectionZone.detectedColliders.Count == 0)
+                {
+                    FlipDirection();
+                }
+
                 rb.velocity = new Vector2(walkSpeed * walkDirectionVector.x, rb.velocity.y);
+            }
             else
+            {
                 rb.velocity = new Vector2(0, rb.velocity.y);
+            }
         }
     }
 
@@ -119,6 +138,16 @@ public class Knight : MonoBehaviourPun, IPunObservable
     private void RPC_ChangeDirection(int direction)
     {
         WalkDirection = (WalkableDirection)direction;
+    }
+
+    // Method to handle cliff detection
+    private void OnCliffDetected()
+    {
+        Debug.Log("Cliff detected, flipping direction!");
+        if (photonView.IsMine)
+        {
+            FlipDirection();
+        }
     }
 
     public void InstantDeath()
