@@ -143,7 +143,6 @@ public class Knight : MonoBehaviourPun, IPunObservable
     // Method to handle cliff detection
     private void OnCliffDetected()
     {
-        Debug.Log("Cliff detected, flipping direction!");
         if (photonView.IsMine)
         {
             FlipDirection();

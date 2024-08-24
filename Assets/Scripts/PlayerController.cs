@@ -327,6 +327,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
     }
 
+    // New Teleport Method
+    public void Teleport(Vector3 newPosition)
+    {
+        if(view.IsMine)
+        {
+            transform.position = newPosition;
+            rb.velocity = Vector2.zero;  // Reset velocity to prevent carryover momentum
+        }
+    }
+
     // Synchronize the facing direction across the network
     [PunRPC]
     private void SyncFacingDirection(bool isFacingRight)
