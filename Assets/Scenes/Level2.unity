@@ -10837,7 +10837,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3915808389176320270, guid: 7e4e954d28adb4c47a2796283c9a549e, type: 3}
       propertyPath: m_Name
-      value: Checkpoint
+      value: CheckpointLevel2
       objectReference: {fileID: 0}
     - target: {fileID: 6916934812248921202, guid: 7e4e954d28adb4c47a2796283c9a549e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -11317,7 +11317,7 @@ GameObject:
   - component: {fileID: 848592921}
   - component: {fileID: 848592920}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: GridLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14431,7 +14431,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1526089783}
   m_Layer: 0
-  m_Name: Environments
+  m_Name: EnvironmentsLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14514,7 +14514,7 @@ GameObject:
   - component: {fileID: 1576294370}
   - component: {fileID: 1576294369}
   m_Layer: 0
-  m_Name: AreaMove
+  m_Name: AreaMoveLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15115,7 +15115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1735142658}
   m_Layer: 0
-  m_Name: PickupItems
+  m_Name: PickupItemsLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15365,7 +15365,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1806393017}
   m_Layer: 0
-  m_Name: Waypoints
+  m_Name: WaypointsLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15788,7 +15788,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1907321837}
   m_Layer: 0
-  m_Name: Traps
+  m_Name: TrapsLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26214,7 +26214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2088917271}
   m_Layer: 0
-  m_Name: Spawners
+  m_Name: SpawnersLevel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26453,7 +26453,6 @@ SceneRoots:
   - {fileID: 845131302}
   - {fileID: 1144458885}
   - {fileID: 1905783938}
-  - {fileID: 848592921}
   - {fileID: 2131386064}
   - {fileID: 1655367787}
   - {fileID: 797631705}
@@ -26464,3 +26463,4 @@ SceneRoots:
   - {fileID: 762188505}
   - {fileID: 1907321837}
   - {fileID: 2088917271}
+  - {fileID: 848592921}
