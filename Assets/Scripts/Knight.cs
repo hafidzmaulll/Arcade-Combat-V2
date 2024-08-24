@@ -150,6 +150,7 @@ public class Knight : MonoBehaviourPun, IPunObservable
         }
     }
 
+    [PunRPC]
     public void InstantDeath()
     {
         if (photonView.IsMine)
