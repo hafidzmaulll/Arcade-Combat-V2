@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 192108968}
   - component: {fileID: 192108967}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: GridBoss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,7 +278,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.14884935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalRotation.w
@@ -32577,7 +32577,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.14884935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalRotation.w
@@ -32700,53 +32700,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 905083418}
   m_CullTransparentMesh: 1
---- !u!1 &1027052862
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1027052864}
-  - component: {fileID: 1027052863}
-  m_Layer: 0
-  m_Name: Script Management
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1027052863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027052862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a520c2aafca57bb4a943277f01577672, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  menupanel: {fileID: 0}
-  settingpanel: {fileID: 0}
-  creditpanel: {fileID: 0}
---- !u!4 &1027052864
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027052862}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 464.44763, y: 193.53813, z: -2.0476637}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1048764542
 GameObject:
   m_ObjectHideFlags: 0
@@ -32757,7 +32710,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1048764543}
   m_Layer: 0
-  m_Name: PickupItems
+  m_Name: PickupItemsBoss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32772,7 +32725,7 @@ Transform:
   m_GameObject: {fileID: 1048764542}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.6386864, y: -5.270783, z: -0.14884935}
+  m_LocalPosition: {x: 3.6386864, y: -5.270783, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32858,6 +32811,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126876627}
   m_CullTransparentMesh: 1
+--- !u!1 &1159594840
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1159594841}
+  - component: {fileID: 1159594842}
+  m_Layer: 0
+  m_Name: SpawnMushroom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1159594841
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159594840}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1159594842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159594840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 685dd783e335c0843b46b172f906bf70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mushroomPrefab: {fileID: 1549875978181120436, guid: ad3427b2a0e10e445a8d3ac70548c2f2, type: 3}
+  spawnPoints:
+  - {fileID: 1159594841}
+  spawnInterval: 5
 --- !u!1001 &1185227862
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43921,7 +43922,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.14884935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44072,7 +44073,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.14884935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44601,7 +44602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.14884935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 485731780918001922, guid: 93929221aca05184daae15c787357706, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44800,7 +44801,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1027052863}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: menu, Assembly-CSharp
         m_MethodName: StartButton
         m_Mode: 5
@@ -45096,7 +45097,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3915808389176320270, guid: 7e4e954d28adb4c47a2796283c9a549e, type: 3}
       propertyPath: m_Name
-      value: Checkpoint
+      value: CheckpointBoss
       objectReference: {fileID: 0}
     - target: {fileID: 6916934812248921202, guid: 7e4e954d28adb4c47a2796283c9a549e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -45199,6 +45200,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7772192635422456020, guid: ad3427b2a0e10e445a8d3ac70548c2f2, type: 3}
+      propertyPath: sceneViewId
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -45210,14 +45215,14 @@ SceneRoots:
   m_Roots:
   - {fileID: 1505979376}
   - {fileID: 1185227862}
-  - {fileID: 192108968}
   - {fileID: 1495633393}
   - {fileID: 354158324}
   - {fileID: 263867475}
   - {fileID: 1485339371}
   - {fileID: 1210496753}
   - {fileID: 1845678332}
-  - {fileID: 2060904895}
-  - {fileID: 1048764543}
   - {fileID: 760571685}
-  - {fileID: 1027052864}
+  - {fileID: 1159594841}
+  - {fileID: 192108968}
+  - {fileID: 1048764543}
+  - {fileID: 2060904895}
