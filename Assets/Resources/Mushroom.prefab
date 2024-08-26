@@ -289,6 +289,7 @@ MonoBehaviour:
   cliffDetectionZone: {fileID: 1822818924472669444}
   walkSpeed: 3
   walkSpeedOnAttack: 6
+  bossDefeatedCanvas: {fileID: 0}
 --- !u!114 &8738511207569164866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -378,6 +379,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 1228138143281752864}
   - {fileID: 8738511207569164866}
   - {fileID: 5666159053498684099}
   - {fileID: 6235535928104627599}
