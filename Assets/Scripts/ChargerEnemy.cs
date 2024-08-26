@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections), typeof(Damageable))]
-public class ChargerEnemy : MonoBehaviour
+public class ChargerEnemy : MonoBehaviourPunCallbacks, IPunObservable
 {
     Animator animator;
     Rigidbody2D rb;
@@ -115,6 +116,8 @@ public class ChargerEnemy : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!photonView.IsMine) return; // Only allow the owner to update the state
+
         if (!damageable.IsAlive)
         {
             // Stop all movement and direction changes when the enemy is dead
@@ -152,10 +155,14 @@ public class ChargerEnemy : MonoBehaviour
         {
             WalkDirection = WalkableDirection.Right;
         }
-        else
-        {
-            Debug.LogError("Invalid WalkDirection value.");
-        }
+
+        photonView.RPC("RPC_FlipDirection", RpcTarget.OthersBuffered, WalkDirection);
+    }
+
+    [PunRPC]
+    private void RPC_FlipDirection(WalkableDirection newDirection)
+    {
+        WalkDirection = newDirection;
     }
 
     public void OnHit(float damage, Vector2 knockback)
@@ -168,6 +175,22 @@ public class ChargerEnemy : MonoBehaviour
         if (touchingDirections != null && touchingDirections.IsGrounded)
         {
             FlipDirection();
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(rb.position);
+            stream.SendNext(rb.velocity);
+            stream.SendNext(transform.localScale);
+        }
+        else
+        {
+            rb.position = (Vector2)stream.ReceiveNext();
+            rb.velocity = (Vector2)stream.ReceiveNext();
+            transform.localScale = (Vector3)stream.ReceiveNext();
         }
     }
 }

@@ -3,24 +3,29 @@ using Photon.Pun;
 
 public class KnightSpawner : MonoBehaviour
 {
-    public GameObject knightPrefab;
-    public Transform[] spawnPoints;
+    public GameObject knightPrefab;       // Reference to the Knight prefab
+    public Transform[] spawnPoints;       // Array of specific spawn points for Knight enemies
 
     void Start()
     {
-        if (PhotonNetwork.IsMasterClient && GameObject.FindObjectsOfType<Knight>().Length == 0)
+        if (PhotonNetwork.IsMasterClient)
         {
-            SpawnKnight();
+            SpawnKnights();
         }
     }
 
-    void SpawnKnight()
+    void SpawnKnights()
     {
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        Vector3 spawnPosition = new Vector3(spawnPoint.position.x, spawnPoint.position.y, 0); // Set Z to 0
-        GameObject knightObject = PhotonNetwork.Instantiate(knightPrefab.name, spawnPosition, Quaternion.identity);
-        Debug.Log("Knight instantiated at position: " + spawnPosition);
+        foreach (Transform spawnPoint in spawnPoints)
+        {
+            // Ensure Z position is set to 0 for 2D alignment
+            Vector3 spawnPosition = new Vector3(spawnPoint.position.x, spawnPoint.position.y, 0);
+
+            // Instantiate the Knight at the specific spawn point's position
+            GameObject knightObject = PhotonNetwork.Instantiate(knightPrefab.name, spawnPosition, Quaternion.identity);
+
+            // Debug log to confirm spawning
+            Debug.Log("Knight instantiated at position: " + spawnPosition);
+        }
     }
-
-
 }

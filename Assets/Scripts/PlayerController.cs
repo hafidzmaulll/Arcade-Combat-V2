@@ -276,12 +276,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void SetCheckpoint(Checkpoint checkpoint)
     {
-        if(view.IsMine)
+        if(photonView.IsMine)
         {
             currentCheckpoint = checkpoint;
+            Debug.Log("Checkpoint set at: " + checkpoint.transform.position);
         }
     }
 
+    [PunRPC]
     public void InstantDeath()
     {
         if(view.IsMine)
@@ -305,7 +307,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         if(view.IsMine)
         {
-            if(currentCheckpoint != null)
+            if(currentCheckpoint != null && photonView.IsMine)
             {
                 transform.position = currentCheckpoint.transform.position;
                 damageable.Health = damageable.MaxHealth;
@@ -322,6 +324,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             {
                 Debug.LogWarning("No checkpoint set");
             }
+        }
+    }
+
+    // New Teleport Method
+    public void Teleport(Vector3 newPosition)
+    {
+        if(view.IsMine)
+        {
+            transform.position = newPosition;
+            rb.velocity = Vector2.zero;  // Reset velocity to prevent carryover momentum
         }
     }
 

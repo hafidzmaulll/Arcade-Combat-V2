@@ -47,6 +47,10 @@ MonoBehaviour:
   - SyncFacingDirection
   - ChangeDirection
   - RPC_ChangeDirection
+  - InstantDeath
+  - PlayerReady
+  - SyncPlayerVisibility
+  - RPC_FlipDirection
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

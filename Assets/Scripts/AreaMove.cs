@@ -1,26 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Photon.Pun;
 
-public class AreaMove : MonoBehaviour
+public class AreaMove : MonoBehaviourPunCallbacks
 {
-    public int sceneBuildIndex;
-
-    // Level move zoned enter, if collider is a player
-    // Move game to another scene
+    public Vector3 teleportDestination;  // Set the destination coordinates in the Inspector
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        print("Trigger Entered");
-
-        // Could use other.GetComponent<Player>() to see if the game object has a Player component
-        // Tags work too. Maybe some players have different script components
-        if(other.tag == "Player")
+        if (other.CompareTag("Player"))
         {
-            // Player entered, so move level
-            print("Switching Scene to " + sceneBuildIndex);
-            SceneManager.LoadScene(sceneBuildIndex, LoadSceneMode.Single);
+            PhotonView photonView = other.GetComponent<PhotonView>();
+
+            if (photonView != null && photonView.IsMine)
+            {
+                PlayerController playerController = other.GetComponent<PlayerController>();
+                
+                if (playerController != null)
+                {
+                    // Teleport the player to the destination
+                    playerController.Teleport(teleportDestination);
+                }
+                else
+                {
+                    Debug.LogError("PlayerController script not found on the player object.");
+                }
+            }
         }
     }
 }

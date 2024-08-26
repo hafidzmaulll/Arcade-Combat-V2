@@ -1,15 +1,23 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 
 public class ConnectToServer : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
+    private AsyncLoader asyncLoader;
+    private string gameMode;
+
     void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
+        // Find the AsyncLoader in the scene and get the game mode
+        asyncLoader = FindObjectOfType<AsyncLoader>();
+        if (asyncLoader != null)
+        {
+            gameMode = asyncLoader.GetGameMode();
+        }
+
+        PhotonNetwork.ConnectUsingSettings();  // Connect to Photon for both Singleplayer and Multiplayer
     }
 
     public override void OnConnectedToMaster()
@@ -19,6 +27,32 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        SceneManager.LoadScene("Lobby");
+        if (gameMode == "Singleplayer")
+        {
+            // Automatically create a room when in Singleplayer mode
+            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1 });
+        }
+        else
+        {
+            // Load the Lobby scene for multiplayer
+            SceneManager.LoadScene("Lobby");
+        }
+    }
+
+    public override void OnCreatedRoom()
+    {
+        if (gameMode == "Singleplayer")
+        {
+            // Automatically load Level 1 when the room is created in Singleplayer mode
+            PhotonNetwork.LoadLevel("Level1");
+        }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        if (gameMode != "Singleplayer")
+        {
+            // For multiplayer, when the room is joined, do nothing extra (or add custom logic here)
+        }
     }
 }
