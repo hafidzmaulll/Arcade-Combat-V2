@@ -103,6 +103,15 @@ public class FirebaseController : MonoBehaviour
 
     public void OpenProfilePanel()
     {
+        menupanel.SetActive(true);  // Hide the menu panel
+        loginPanel.SetActive(false);
+        signupPanel.SetActive(false);
+        profilePanel.SetActive(false);
+        forgetPasswordPanel.SetActive(false);
+    }
+    
+    public void ButtonProfilePanel()
+    {
         menupanel.SetActive(false);  // Hide the menu panel
         loginPanel.SetActive(false);
         signupPanel.SetActive(false);
