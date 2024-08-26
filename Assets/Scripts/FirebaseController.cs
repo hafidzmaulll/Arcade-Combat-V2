@@ -12,7 +12,7 @@ using Firebase.Extensions;
 public class FirebaseController : MonoBehaviour
 {
 
-    public GameObject loginPanel, signupPanel, profilePanel, forgetPasswordPanel, notificationPanel;
+    public GameObject loginPanel, signupPanel, profilePanel, forgetPasswordPanel, notificationPanel, menupanel, controlpanel, settingpanel, creditpanel;
 
     public InputField loginEmail, loginPassword, signupEmail, signupPassword, signupCPassword, signupUsername, forgetPassEmail;
 
@@ -61,8 +61,25 @@ public class FirebaseController : MonoBehaviour
         });
     }
 
+    public void BackToMainMenu()
+    {
+        // Hide the profile panel
+        profilePanel.SetActive(false);
+
+        // Show the main menu panel
+        menupanel.SetActive(true);
+        controlpanel.SetActive(false);
+        settingpanel.SetActive(false);
+        creditpanel.SetActive(false);
+    }
+
     public void OpenLoginPanel()
     {
+        // Reset the input fields for login
+        loginEmail.text = "";
+        loginPassword.text = "";
+
+        menupanel.SetActive(false);  // Hide the menu panel
         loginPanel.SetActive(true);
         signupPanel.SetActive(false);
         profilePanel.SetActive(false);
@@ -71,6 +88,13 @@ public class FirebaseController : MonoBehaviour
 
     public void OpenSignUpPanel()
     {
+        // Reset the input fields for sign-up
+        signupEmail.text = "";
+        signupPassword.text = "";
+        signupCPassword.text = "";
+        signupUsername.text = ""; 
+
+        menupanel.SetActive(false);  // Hide the menu panel
         loginPanel.SetActive(false);
         signupPanel.SetActive(true);
         profilePanel.SetActive(false);
@@ -79,6 +103,7 @@ public class FirebaseController : MonoBehaviour
 
     public void OpenProfilePanel()
     {
+        menupanel.SetActive(false);  // Hide the menu panel
         loginPanel.SetActive(false);
         signupPanel.SetActive(false);
         profilePanel.SetActive(true);
@@ -87,6 +112,10 @@ public class FirebaseController : MonoBehaviour
 
     public void OpenForgetPassPanel()
     {
+        // Reset the input fields for forget password
+        forgetPassEmail.text = "";
+        
+        menupanel.SetActive(false);  // Hide the menu panel
         loginPanel.SetActive(false);
         signupPanel.SetActive(false);
         profilePanel.SetActive(false);
@@ -150,6 +179,7 @@ public class FirebaseController : MonoBehaviour
         profileUserName_Text.text = "";
         profileUserEmail_Text.text = "";
         OpenLoginPanel();
+        menupanel.SetActive(false);  // Hide the menu panel when logging out
     }
 
     void CreateUser(string email, string password, string Username)
@@ -371,5 +401,4 @@ public class FirebaseController : MonoBehaviour
             ShowNotificationMessage("Alert", "Successfully Send Email For Reset Password!");
         });
     }
-
 }

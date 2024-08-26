@@ -4,9 +4,9 @@ using Photon.Pun;
 
 public class SceneTransitionManager : MonoBehaviourPunCallbacks
 {
-    public string mainMenuSceneName = "MainMenu";
+    public string SceneName;
 
-    public void GoToMainMenu()
+    public void MovingScene()
     {
         if (PhotonNetwork.InRoom)
         {
@@ -28,6 +28,6 @@ public class SceneTransitionManager : MonoBehaviourPunCallbacks
     private void LoadMainMenuScene()
     {
         PhotonNetwork.Disconnect();
-        SceneManager.LoadScene(mainMenuSceneName);
+        SceneManager.LoadScene(SceneName);
     }
 }

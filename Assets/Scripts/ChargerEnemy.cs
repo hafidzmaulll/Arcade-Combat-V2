@@ -16,6 +16,7 @@ public class ChargerEnemy : MonoBehaviourPunCallbacks, IPunObservable
     public float walkSpeed = 3f;
     public float walkSpeedOnAttack = 6f; // Speed when charging towards the player
     public enum WalkableDirection { Right, Left }
+    public GameObject bossDefeatedCanvas;
 
     private Vector2 walkDirectionVector = Vector2.right;
     private WalkableDirection _walkDirection;
@@ -97,6 +98,14 @@ public class ChargerEnemy : MonoBehaviourPunCallbacks, IPunObservable
         if (cliffDetectionZone == null) Debug.LogError("CliffDetectionZone is not assigned.");
     }
 
+    private void Start()
+    {
+        if(bossDefeatedCanvas != null)
+        {
+            bossDefeatedCanvas.SetActive(false);
+        }
+    }
+
     void Update()
     {
         if (attackZone != null)
@@ -122,6 +131,13 @@ public class ChargerEnemy : MonoBehaviourPunCallbacks, IPunObservable
         {
             // Stop all movement and direction changes when the enemy is dead
             rb.velocity = Vector2.zero;
+
+            // Show the pop-up when the boss is defeated
+            if (bossDefeatedCanvas != null && photonView.IsMine)
+            {
+                bossDefeatedCanvas.SetActive(true);
+            }
+            
             return;
         }
 

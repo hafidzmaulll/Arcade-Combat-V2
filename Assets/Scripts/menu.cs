@@ -7,16 +7,26 @@ using UnityEngine.SceneManagement;
 public class menu : MonoBehaviour
 {
     public GameObject menupanel;
+    public GameObject controlpanel;
     public GameObject settingpanel;
     public GameObject creditpanel;
+
     // Start is called before the first frame update
     void Start()
     {
-        menupanel.SetActive(true);
-        settingpanel.SetActive(false);
-        creditpanel.SetActive(false);
+        HideAllPanels();
+        menupanel.SetActive(true);  // Show the menu panel by default when the scene starts
         settingpanel.GetComponent<SettingAudio>().Start();
         AudioManager.instance.Play("Musik Main");
+    }
+
+    // Hide all panels to prevent them from overlapping
+    void HideAllPanels()
+    {
+        menupanel.SetActive(false);
+        controlpanel.SetActive(false);
+        settingpanel.SetActive(false);
+        creditpanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -30,23 +40,28 @@ public class menu : MonoBehaviour
         SceneManager.LoadScene(scenename);
     }
 
+    public void ControlButton()
+    {
+        HideAllPanels();
+        controlpanel.SetActive(true);
+    }
+
     public void SettingButton()
     {
-        menupanel.SetActive(false);
+        HideAllPanels();
         settingpanel.SetActive(true);
     }
 
     public void CreditButton()
     {
-        menupanel.SetActive(false);
+        HideAllPanels();
         creditpanel.SetActive(true);
     }
 
     public void BackButton()
     {
+        HideAllPanels();
         menupanel.SetActive(true);
-        settingpanel.SetActive(false);
-        creditpanel.SetActive(false);
     }
 
     public void QuitButton()
@@ -59,6 +74,4 @@ public class menu : MonoBehaviour
         Application.Quit();
 #endif
     }
-
-
 }

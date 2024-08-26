@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public float walkSpeed = 5f;
     public float runSpeed = 8f;
     private Checkpoint currentCheckpoint;
+    public GameObject Mark;
 
     // Dash variables
     private bool canDash = true;
