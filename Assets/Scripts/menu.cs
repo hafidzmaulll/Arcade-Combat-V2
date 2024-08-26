@@ -7,12 +7,14 @@ using UnityEngine.SceneManagement;
 public class menu : MonoBehaviour
 {
     public GameObject menupanel;
+    public GameObject controlpanel;
     public GameObject settingpanel;
     public GameObject creditpanel;
     // Start is called before the first frame update
     void Start()
     {
         menupanel.SetActive(true);
+        controlpanel.SetActive(false);
         settingpanel.SetActive(false);
         creditpanel.SetActive(false);
         settingpanel.GetComponent<SettingAudio>().Start();
@@ -30,6 +32,12 @@ public class menu : MonoBehaviour
         SceneManager.LoadScene(scenename);
     }
 
+    public void ControlButton()
+    {
+        menupanel.SetActive(false);
+        controlpanel.SetActive(true);
+    }
+
     public void SettingButton()
     {
         menupanel.SetActive(false);
@@ -45,6 +53,7 @@ public class menu : MonoBehaviour
     public void BackButton()
     {
         menupanel.SetActive(true);
+        controlpanel.SetActive(false);
         settingpanel.SetActive(false);
         creditpanel.SetActive(false);
     }
